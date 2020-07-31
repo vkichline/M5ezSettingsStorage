@@ -25,18 +25,59 @@ const String ssid("SSID");
 const String key("key");
 
 
-// Given an open, read-write preferences reference for M5EZ_NAMESPACE,
-// 
+// Read all the settings from NVS and return them in a structure.
+// Return true for success, false for failure.
 //
-void erase_networks(Preferences& prefs) {
-  int n = 1;
+bool fetch_settings_from_nvs(M5Settings* settings) {
+  Preferences prefs;
+  String      str;
+  uint8_t     index = 1;
+
+  if(nullptr == settings) return false;
+  prefs.begin(M5EZ_NAMESPACE, true); // read-only
+
+  // Fetch WiFi settings
+  settings->autoconnect_on = prefs.getBool("autoconnect_on", true);
+  while(true) {
+    String sindex = String(index++);
+    String ssidn  = ssid + sindex;
+    String keyn   = key  + sindex;
+    str           = prefs.getString(ssidn.c_str(), "");
+    if(0 == str.length()) break;  // We've run out of WiFi networks
+    SsidPswd pair;
+    pair.SSID     = str;
+    pair.password = prefs.getString(keyn.c_str(),  "");
+    settings->networks.push_back(pair);
+  }
+
+  // Fetch battery settings
+  settings->battery_icon_on = prefs.getBool("battery_icon_on", false);
+
+  // Fetch the clock settings
+  settings->clock_on = prefs.getBool("clock_on", true);
+  settings->timezone = prefs.getString("timezone", "GeoIP");
+  settings->clock12  = prefs.getBool("clock12", false);
+  settings->ampm     =   prefs.getBool("ampm", false);
+
+  // Fetch the Backlight settings
+  settings->brightness  = prefs.getUChar("brightness", 128);
+  settings->inactivity  = prefs.getUChar("inactivity", 0);
+
+  // Fetch the FACES setting
+  settings->faces_on = prefs.getBool("faces_on", false);
+
+  // Save the theme setting
+  settings->theme = prefs.getString("theme", "");
+
+  prefs.end();
+  return true;
 }
 
 
 // Using ArduinoJSON, read all the settings from the JSON file provided and replace the NVS settings with them.
 // Return true for success, false for failure.
 //
-bool read_settings_from_file(File json_file) {
+bool load_settings_from_file(File json_file) {
   Preferences prefs;
   uint8_t     index = 1;
   const int   capacity = JSON_OBJECT_SIZE(74) + 1024; // Room for 32 networks, 1KB of strings
@@ -44,7 +85,7 @@ bool read_settings_from_file(File json_file) {
 
   DeserializationError err = deserializeJson(doc, json_file);
   if (err) {
-    Serial.print(F("deserializeJson() returned "));
+    Serial.print("deserializeJson() returned ");
     Serial.println(err.c_str());
     return false;
   }
@@ -86,12 +127,12 @@ bool read_settings_from_file(File json_file) {
 // Write all the settings from M5ez's NVS NameSpace to the JSON file provided.
 // Return true for success, false for failure.
 //
-bool write_settings_to_file(File json_file) {
+bool save_settings_to_file(File json_file) {
   Preferences prefs;
   String      str;
   uint8_t     index = 1;
 
-  if( 0 == json_file.print("{\n")) return false;  // If writing fails, return an error
+  if(0 == json_file.print("{\n")) return false;  // If writing fails, return an error
   prefs.begin(M5EZ_NAMESPACE, true); // read-only
 
   // Save WiFi settings
@@ -131,11 +172,13 @@ bool write_settings_to_file(File json_file) {
 }
 
 
-// Clear all the settings form NVS memeory on the M5Stack.
+// Clear all the M5ez-specific settings from NVS memeory on the M5Stack.
 //
-void clear_settings() {
+bool clear_m5ez_nvs_settings() {
+  bool result;
   Preferences prefs;
-  prefs.begin(M5EZ_NAMESPACE);
+  result = prefs.begin(M5EZ_NAMESPACE, false); // read-write
   prefs.clear();
   prefs.end();
+  return result;
 }
