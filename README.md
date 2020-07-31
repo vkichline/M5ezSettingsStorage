@@ -13,7 +13,9 @@ Required equipment:
 * Formatted SD card
 
 Compile the program and upload it to an M5Stack that has previously used the M5ez library.
-* Select "Save Settings to File" to write M5ez's NVS settings to StoredSettings.json
-* Select "Restore Settings from File" to read StoredSettings.json from SD and set all NVS settings on the M5Stack
+* Select "Display M5ez Settings" to show all persistent NVS settings in the "M5ez" Namespace.
+* Select "Save M5ez Settings to File" to write M5ez's NVS settings to StoredSettings.json.
+* Select "Restore Settings from File" to read StoredSettings.json from SD and set all NVS settings on the M5Stack.
+* Select "View Settings File" to show the contents of StoredSettings.json on the SD card.
 * Select "Delete Settings File from SD" to remove StoredSettings.json from the SD card.
-* Select "Remove M5Stack NVS Settings" to clear the NVS memory of M5ez's settings
+* Select "Delete M5Stack NVS Settings" to clear the NVS memory of M5ez's settings
