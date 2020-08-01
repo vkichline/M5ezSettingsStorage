@@ -31,12 +31,12 @@ bool test_prefs_file_found() {
 }
 
 
-// Read all settngs and display them in a menu
+// Read all settings and display them in a menu
 //
 void display_nvs_settings() {
   M5Settings  settings;
   if(!fetch_settings_from_nvs(&settings)) {
-    ez.msgBox("Error", "Faild to load M5ez NVS settings.");
+    ez.msgBox("Error", "Failed to load M5ez NVS settings.");
     return;
   }
   ezMenu menu("Current M5ez Settings");
@@ -130,7 +130,7 @@ void delete_settings() {
 }
 
 
-// Verify that the user really wants to clar the M5ez namespace, then delete all settings.
+// Verify that the user really wants to clear the M5ez namespace, then delete all settings.
 //
 void clear_settings() {
   String result = ez.msgBox("Warning", "This will delete all M5ez presistent settings from NVS. Be sure to Save M5ez Settings to File first.", "Delete ## Cancel");

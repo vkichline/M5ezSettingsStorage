@@ -172,7 +172,7 @@ bool save_settings_to_file(File json_file) {
 }
 
 
-// Clear all the M5ez-specific settings from NVS memeory on the M5Stack.
+// Clear all the M5ez-specific settings from NVS memory on the M5Stack.
 //
 bool clear_m5ez_nvs_settings() {
   bool result;
